@@ -39,7 +39,7 @@ func domainsList(client *smtpsdk.Client) error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	fmt.Fprintln(w, "DOMAIN\tSTATUS\tVERIFIED")
 	for _, d := range domains.Data {
-		fmt.Fprintf(w, "%s\t%s\t%v\n", d.Domain, d.Status, d.IsVerified)
+		fmt.Fprintf(w, "%s\t%v\t%v\n", d.Domain, d.Status, d.IsVerified)
 	}
 	return w.Flush()
 }
@@ -73,7 +73,7 @@ func domainsGet(client *smtpsdk.Client, args []string) error {
 		return err
 	}
 
-	fmt.Printf("Domain: %s\nStatus: %s\nVerified: %v\n", result.Domain, result.Status, result.IsVerified)
+	fmt.Printf("Domain: %s\nStatus: %v\nVerified: %v\n", result.Domain, result.Status, result.IsVerified)
 	return nil
 }
 
