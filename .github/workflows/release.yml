@@ -67,7 +67,7 @@ jobs:
         run: |
           cd artifacts
           for f in ktx-*; do
-            sha256sum "$f" > "${f}.sha256"
+            sha256sum "$f" > "${f}.sha256sum"
           done
 
       - name: Create Release
@@ -75,7 +75,7 @@ jobs:
         with:
           files: |
             artifacts/ktx-*
-            artifacts/*.sha256
+            artifacts/*.sha256sum
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
