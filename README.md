@@ -4,6 +4,19 @@ CLI tool for managing KirimEmail SMTP API - domains, credentials, email sending,
 
 ## Installation
 
+### Install script (recommended)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/kirimemail/ktx/main/install.sh | bash
+```
+
+Or with a specific version:
+```bash
+curl -fsSL https://raw.githubusercontent.com/kirimemail/ktx/main/install.sh | bash -s v1.0.0
+```
+
+### From source
+
 ```bash
 go install
 ```
