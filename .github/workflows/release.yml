@@ -66,16 +66,28 @@ jobs:
       - name: Create checksums
         run: |
           cd artifacts
-          for f in ktx-*; do
-            sha256sum "$f" > "${f}.sha256sum"
+          for f in ktx-*-amd64.exe ktx-*-arm64.exe ktx-*-amd64 ktx-*-arm64; do
+            if [ -f "$f" ]; then
+              sha256sum "$f" > "${f}.sha256sum"
+            fi
           done
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            artifacts/ktx-*
-            artifacts/*.sha256sum
+            artifacts/ktx-linux-amd64
+            artifacts/ktx-linux-arm64
+            artifacts/ktx-darwin-amd64
+            artifacts/ktx-darwin-arm64
+            artifacts/ktx-windows-amd64.exe
+            artifacts/ktx-windows-arm64.exe
+            artifacts/ktx-linux-amd64.sha256sum
+            artifacts/ktx-linux-arm64.sha256sum
+            artifacts/ktx-darwin-amd64.sha256sum
+            artifacts/ktx-darwin-arm64.sha256sum
+            artifacts/ktx-windows-amd64.exe.sha256sum
+            artifacts/ktx-windows-arm64.exe.sha256sum
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
