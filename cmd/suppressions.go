@@ -110,16 +110,15 @@ func suppressionsDelete(client *smtpsdk.Client, args []string) error {
 		}
 	}
 
-	var result *smtpsdk.SuppressionDeleteResponse
 	var err error
 
 	switch supType {
 	case "unsubscribe":
-		result, err = client.Suppressions().DeleteUnsubscribes(domain, ids)
+		err = client.Suppressions().DeleteUnsubscribes(domain, ids)
 	case "bounce":
-		result, err = client.Suppressions().DeleteBounces(domain, ids)
+		err = client.Suppressions().DeleteBounces(domain, ids)
 	case "whitelist":
-		result, err = client.Suppressions().DeleteWhitelists(domain, ids)
+		err = client.Suppressions().DeleteWhitelists(domain, ids)
 	default:
 		return fmt.Errorf("unknown suppression type: %s", supType)
 	}
@@ -128,6 +127,6 @@ func suppressionsDelete(client *smtpsdk.Client, args []string) error {
 		return err
 	}
 
-	fmt.Printf("Deleted %d suppressions\n", result.DeletedCount)
+	fmt.Printf("Deleted suppressions\n")
 	return nil
 }

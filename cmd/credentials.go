@@ -92,7 +92,7 @@ func credentialsDelete(client *smtpsdk.Client, args []string) error {
 	domain := args[0]
 	guid := args[1]
 
-	_, err := client.Credentials().Delete(domain, guid)
+	err := client.Credentials().Delete(domain, guid)
 	if err != nil {
 		return err
 	}

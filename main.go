@@ -145,13 +145,13 @@ Usage:
   ktx [command] [flags]
 
 Commands:
-  domains      Manage domains (list, create, get, delete, verify)
+  domains      Manage domains (list, create, get, delete, verify, setup-auth-domain, verify-auth-domain, delete-auth-domain, setup-tracklink, verify-tracklink, delete-tracklink)
   credentials  Manage SMTP credentials (list, create, get, delete, reset-password)
   send         Send an email
   validate     Validate email addresses (email, batch)
   logs         Retrieve email logs
   suppressions Manage suppressions (list, create-whitelist, delete)
-  webhooks     Manage webhooks (list, create, get, delete, test)
+  webhooks     Manage webhooks (list, create, get, delete, test, update)
   quota        Get user quota information
 
 Flags:

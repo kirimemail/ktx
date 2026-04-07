@@ -10,7 +10,7 @@ import (
 
 func WebhooksCmd(client *smtpsdk.Client, defaultDomain string, args []string) error {
 	if len(args) < 1 {
-		return fmt.Errorf("webhooks command requires subcommand: list, create, get, delete, test")
+		return fmt.Errorf("webhooks command requires subcommand: list, create, get, delete, test, update")
 	}
 
 	subCmd := args[0]
@@ -25,6 +25,8 @@ func WebhooksCmd(client *smtpsdk.Client, defaultDomain string, args []string) er
 		return webhooksDelete(client, args[1:])
 	case "test":
 		return webhooksTest(client, args[1:])
+	case "update":
+		return webhooksUpdate(client, args[1:])
 	default:
 		return fmt.Errorf("unknown webhooks subcommand: %s", subCmd)
 	}
@@ -92,7 +94,7 @@ func webhooksDelete(client *smtpsdk.Client, args []string) error {
 	domain := args[0]
 	guid := args[1]
 
-	_, err := client.Webhooks().Delete(domain, guid)
+	err := client.Webhooks().Delete(domain, guid)
 	if err != nil {
 		return err
 	}
@@ -122,5 +124,33 @@ func webhooksTest(client *smtpsdk.Client, args []string) error {
 	} else {
 		fmt.Printf("Test failed with status: %d\n", result.Data.ResponseStatus)
 	}
+	return nil
+}
+
+func webhooksUpdate(client *smtpsdk.Client, args []string) error {
+	if len(args) < 3 {
+		return fmt.Errorf("usage: ktx webhooks update <domain> <guid> <type|url> <value>")
+	}
+	domain := args[0]
+	guid := args[1]
+	field := args[2]
+	value := args[3]
+
+	var req smtpsdk.WebhookUpdateRequest
+	switch field {
+	case "type":
+		req.Type = smtpsdk.StringPtr(value)
+	case "url":
+		req.URL = smtpsdk.StringPtr(value)
+	default:
+		return fmt.Errorf("unknown field: %s (use type or url)", field)
+	}
+
+	_, err := client.Webhooks().Update(domain, guid, req)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Webhook updated: %s\n", guid)
 	return nil
 }
