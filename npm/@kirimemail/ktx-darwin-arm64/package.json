@@ -1,0 +1,15 @@
+{
+  "name": "@kirimemail/ktx-darwin-arm64",
+  "version": "0.0.0",
+  "description": "KirimEmail SMTP CLI client - macOS arm64 (Apple Silicon) binary",
+  "keywords": ["kirimemail", "smtp", "cli", "macos"],
+  "files": ["ktx", "package.json"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirimemail/ktx.git"
+  },
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "preferUnplugged": true
+}

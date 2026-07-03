@@ -1,0 +1,5 @@
+*
+!bin/
+!@kirimemail/
+!README.md
+!package.json
