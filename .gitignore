@@ -27,6 +27,10 @@ go.work.sum
 # env file
 .env
 
+# npm platform binaries (placed by CI publish step)
+npm/@kirimemail/*/ktx
+npm/@kirimemail/*/ktx.exe
+
 # Editor/IDE
 # .idea/
 # .vscode/

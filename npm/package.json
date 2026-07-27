@@ -1,0 +1,42 @@
+{
+  "name": "@kirimemail/ktx",
+  "version": "0.0.0",
+  "description": "KirimEmail SMTP CLI client - manage domains, credentials, send emails, validate, logs, webhooks, and quota",
+  "keywords": [
+    "kirimemail",
+    "smtp",
+    "cli",
+    "email",
+    "kirim-email"
+  ],
+  "homepage": "https://github.com/kirimemail/ktx",
+  "bugs": {
+    "url": "https://github.com/kirimemail/ktx/issues"
+  },
+  "license": "MIT",
+  "author": "KirimEmail",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kirimemail/ktx.git"
+  },
+  "bin": {
+    "ktx": "bin/ktx.js"
+  },
+  "files": [
+    "bin/",
+    "@kirimemail/",
+    "README.md"
+  ],
+  "optionalDependencies": {
+    "@kirimemail/ktx-linux-x64": "0.0.0",
+    "@kirimemail/ktx-linux-arm64": "0.0.0",
+    "@kirimemail/ktx-darwin-x64": "0.0.0",
+    "@kirimemail/ktx-darwin-arm64": "0.0.0",
+    "@kirimemail/ktx-win32-x64": "0.0.0",
+    "@kirimemail/ktx-win32-arm64": "0.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "preferUnplugged": false
+}

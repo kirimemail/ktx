@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -27,7 +27,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.21'
+          go-version: "1.26"
 
       - name: Get dependencies
         run: go mod download
@@ -73,7 +73,7 @@ jobs:
           done
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             artifacts/ktx-linux-amd64
@@ -91,3 +91,107 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Map and copy binaries into npm platform packages
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "Publishing ktx v${VERSION} to npm"
+
+          # Map build artifact names -> npm platform package dirs
+          declare -A MAP
+          MAP["ktx-linux-amd64"]="@kirimemail/ktx-linux-x64"
+          MAP["ktx-linux-arm64"]="@kirimemail/ktx-linux-arm64"
+          MAP["ktx-darwin-amd64"]="@kirimemail/ktx-darwin-x64"
+          MAP["ktx-darwin-arm64"]="@kirimemail/ktx-darwin-arm64"
+          MAP["ktx-windows-amd64.exe"]="@kirimemail/ktx-win32-x64"
+          MAP["ktx-windows-arm64.exe"]="@kirimemail/ktx-win32-arm64"
+
+          for artifact_name in "${!MAP[@]}"; do
+            pkg_dir="${MAP[$artifact_name]}"
+            src="artifacts/${artifact_name}"
+            if [ ! -f "$src" ]; then
+              echo "WARNING: $src not found, skipping $pkg_dir"
+              continue
+            fi
+
+            dest_dir="npm/${pkg_dir}"
+            mkdir -p "$dest_dir"
+
+            # Detect extension from source name
+            case "$artifact_name" in
+              *.exe) dst_name="ktx.exe" ;;
+              *)     dst_name="ktx" ;;
+            esac
+
+            cp "$src" "${dest_dir}/${dst_name}"
+            chmod +x "${dest_dir}/${dst_name}"
+
+            # Update version in platform package.json
+            echo "  -> ${pkg_dir}"
+            node -e "
+              const p = require('./${dest_dir}/package.json');
+              p.version = process.argv[1];
+              require('fs').writeFileSync('./${dest_dir}/package.json', JSON.stringify(p, null, 2) + '\\n');
+            " "$VERSION"
+          done
+
+      - name: Update main package.json version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          node -e "
+            const p = require('./npm/package.json');
+            p.version = process.argv[1];
+            // Keep optionalDependencies in sync
+            for (const key of Object.keys(p.optionalDependencies || {})) {
+              p.optionalDependencies[key] = process.argv[1];
+            }
+            require('fs').writeFileSync('./npm/package.json', JSON.stringify(p, null, 2) + '\\n');
+          " "$VERSION"
+
+      - name: Publish platform-specific packages
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          for pkg_dir in npm/@kirimemail/*/; do
+            pkg_name="$(basename "$pkg_dir")"
+            echo "Publishing ${pkg_name}@${VERSION}..."
+            cd "$pkg_dir"
+            npm publish --access public --provenance
+            cd "$OLDPWD"
+          done
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish main package
+        run: |
+          cd npm
+          npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
